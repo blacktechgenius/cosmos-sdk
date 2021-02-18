@@ -16,5 +16,5 @@ var _ MigrationKeeper = (*Keeper)(nil)
 
 // Migrate1 implements MigrationKeeper.Migrate1 method.
 func (keeper Keeper) Migrate1(ctx sdk.Context) error {
-	return v042.MigrateStore(ctx, keeper.storeKey)
+	return v042.MigrateStore(ctx, keeper.storeKey, keeper.cdc)
 }

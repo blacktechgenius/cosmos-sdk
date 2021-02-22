@@ -8,11 +8,12 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 // NewVote creates a new Vote instance
 //nolint:interfacer
-func NewVote(proposalID uint64, voter sdk.AccAddress, option VoteOption) Vote {
+func NewVote(proposalID uint64, voter sdk.AccAddress, option types.VoteOption) Vote {
 	return Vote{proposalID, voter.String(), option}
 }
 
@@ -57,42 +58,21 @@ func (v Vote) Empty() bool {
 
 // VoteOptionFromString returns a VoteOption from a string. It returns an error
 // if the string is invalid.
-func VoteOptionFromString(str string) (VoteOption, error) {
-	option, ok := VoteOption_value[str]
+func VoteOptionFromString(str string) (types.VoteOption, error) {
+	option, ok := types.VoteOption_value[str]
 	if !ok {
-		return OptionEmpty, fmt.Errorf("'%s' is not a valid vote option", str)
+		return types.OptionEmpty, fmt.Errorf("'%s' is not a valid vote option", str)
 	}
-	return VoteOption(option), nil
+	return types.VoteOption(option), nil
 }
 
 // ValidVoteOption returns true if the vote option is valid and false otherwise.
-func ValidVoteOption(option VoteOption) bool {
-	if option == OptionYes ||
-		option == OptionAbstain ||
-		option == OptionNo ||
-		option == OptionNoWithVeto {
+func ValidVoteOption(option types.VoteOption) bool {
+	if option == types.OptionYes ||
+		option == types.OptionAbstain ||
+		option == types.OptionNo ||
+		option == types.OptionNoWithVeto {
 		return true
 	}
 	return false
-}
-
-// Marshal needed for protobuf compatibility.
-func (vo VoteOption) Marshal() ([]byte, error) {
-	return []byte{byte(vo)}, nil
-}
-
-// Unmarshal needed for protobuf compatibility.
-func (vo *VoteOption) Unmarshal(data []byte) error {
-	*vo = VoteOption(data[0])
-	return nil
-}
-
-// Format implements the fmt.Formatter interface.
-func (vo VoteOption) Format(s fmt.State, verb rune) {
-	switch verb {
-	case 's':
-		s.Write([]byte(vo.String()))
-	default:
-		s.Write([]byte(fmt.Sprintf("%v", byte(vo))))
-	}
 }
